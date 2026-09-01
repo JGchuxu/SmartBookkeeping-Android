@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_bill"
+        android:icon="@drawable/phebe_sleep"
+        android:title="账单" />
+    <item
+        android:id="@+id/nav_overview"
+        android:icon="@drawable/phebe_glow"
+        android:title="总览" />
+    <item
+        android:id="@+id/nav_stats"
+        android:icon="@drawable/phebe_shy"
+        android:title="统计" />
+    <item
+        android:id="@+id/nav_note"
+        android:icon="@drawable/phebe_speechless"
+        android:title="笔记" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/phebe_soft"
+        android:title="设置" />
+</menu>

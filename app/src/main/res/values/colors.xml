@@ -1,0 +1,12 @@
+<resources>
+    <color name="primary">#4DB6AC</color>
+    <color name="primary_dark">#26A69A</color>
+    <color name="accent">#FFB74D</color>
+    <color name="expense">#FF5A5A</color>
+    <color name="income">#43C478</color>
+    <color name="bg_page">#E8F5F2</color>
+    <color name="surface_white">#FFFFFF</color>
+    <color name="text_primary">#2E3A38</color>
+    <color name="text_secondary">#88A09C</color>
+    <color name="divider">#E0E8E5</color>
+</resources>
