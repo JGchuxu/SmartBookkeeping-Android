@@ -1,7 +1,7 @@
 from PIL import Image
 import os
 
-src = r"C:\Users\JGchuxu\Downloads\1756403063932.png"
+src = r"你的图标原图路径.png"  # TODO: 替换为本地图标源图路径
 sizes = {
     'mdpi': 48,
     'hdpi': 72,
