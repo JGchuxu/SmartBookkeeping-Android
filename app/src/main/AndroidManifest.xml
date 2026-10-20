@@ -29,9 +29,9 @@
         <activity android:name=".CategoryManageActivity" android:exported="false" />
         <activity android:name=".PendingActivity" android:exported="false" />
         <activity android:name=".NotifyLogActivity" android:exported="false" />
+        <activity android:name=".PendingMessageActivity" android:exported="false" />
         <activity android:name=".NoteEditActivity" android:exported="false" />
         <activity android:name=".FinanceOverviewActivity" android:exported="false" />
-        <activity android:name=".AIChatActivity" android:exported="false" />
 
         <service
             android:name=".service.BillNotificationListener"

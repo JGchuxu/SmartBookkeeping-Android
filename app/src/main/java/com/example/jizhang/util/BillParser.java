@@ -139,8 +139,8 @@ public class BillParser {
         return false;
     }
 
-    /** 提取金额：¥/￥ 符号 → 元后缀 → 纯数字（带小数优先） */
-    private static Double extractAmount(String s) {
+    /** 提取金额：¥/￥ 符号 → 元后缀 → 纯数字（带小数优先）；公开供"待处理消息"预填使用 */
+    public static Double extractAmount(String s) {
         Matcher m1 = Pattern.compile("[¥￥]\\s*(\\d[\\d,]*(?:\\.\\d{1,2})?)").matcher(s);
         if (m1.find()) return parseNum(m1.group(1));
 
@@ -172,7 +172,8 @@ public class BillParser {
             if (s.contains(k)) return Transaction.TYPE_INCOME;
         }
         String[] expense = {"支付", "消费", "付款", "扣款", "支出", "购买", "已支付", "交易成功",
-                "买单", "付款成功", "扣费", "转出", "消费支出", "消费成功", "下单", "订单", "成交"};
+                "买单", "付款成功", "扣费", "转出", "消费支出", "消费成功", "下单", "订单", "成交",
+                "转账给", "转给", "付给"};
         for (String k : expense) {
             if (s.contains(k)) return Transaction.TYPE_EXPENSE;
         }

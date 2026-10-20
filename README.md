@@ -18,7 +18,7 @@ Java 17 · Android SDK 34 · SQLite · Material Design 3 · Canvas
 
 除自动记账外，还提供账单管理、多账户财务总览、消费统计图表、笔记待办、自然语言快捷记账等完整功能。
 
-> 🎓 本项目为个人独立开发作品（同时作为毕业设计项目），从需求分析、架构设计到编码实现、打包发布全流程独立完成。
+> 🎓 本项目为个人作品（同时作为毕业设计项目），从需求分析、架构设计到功能验收、打包发布全流程由本人主导完成，编码实现阶段借助 AI 辅助编程提效。
 
 ---
 
@@ -28,7 +28,7 @@ Java 17 · Android SDK 34 · SQLite · Material Design 3 · Canvas
 - 基于 `NotificationListenerService` 实时监听微信、支付宝的消费通知
 - 通过正则与关键词规则提取**金额、收支方向、退款标识**，自动写入账单
 - 构建**广告词库**（促销/活动/电商大促/直播种草等 7 大类）过滤营销内容，避免垃圾信息污染账目
-- 无法识别的通知（如分不清金额或收支）自动转入**待办列表**，供用户手动处理
+- 无法识别的通知（如分不清金额或收支）自动转入**「待处理消息」独立界面**，支持一键去记账或忽略
 - 三重去重策略（来源 + 金额 + 5 分钟时间窗口），避免同一笔消费重复入账
 
 ### 🔋 后台常驻保活
@@ -67,13 +67,13 @@ Java 17 · Android SDK 34 · SQLite · Material Design 3 · Canvas
 
 | 层次 | 技术选型 |
 |------|---------|
-| **开发语言** | Java 17（主体，46 个源文件约 5900 行）+ Kotlin（1 个文件，JNI 封装） |
+| **开发语言** | Java 17（45 个源文件约 5970 行） |
 | **平台** | Android SDK 34（compileSdk / targetSdk），minSdk 24（Android 7.0+） |
 | **UI 框架** | Material Design 3、XML 布局、RecyclerView |
 | **数据持久化** | 原生 SQLite（SQLiteOpenHelper），**手写全部 SQL，未使用 ORM** |
 | **图表** | Canvas 自绘（Paint / Path / RectF） |
 | **核心服务** | NotificationListenerService、Foreground Service、AlarmManager |
-| **组件** | 9 个 Activity + 4 个 Fragment + 3 个 BroadcastReceiver |
+| **组件** | 9 个 Activity + 4 个 Fragment + 1 个前台 Service + 3 个 BroadcastReceiver |
 | **构建** | Gradle 8.9 + AGP 8.5.2（纯命令行打包，未使用 Android Studio） |
 
 ### 📦 第三方依赖（仅 5 项）
@@ -83,7 +83,7 @@ androidx.appcompat:appcompat:1.7.0                    // 兼容支持
 com.google.android.material:material:1.11.0           // Material Design 3
 androidx.recyclerview:recyclerview:1.3.2              // 列表
 androidx.constraintlayout:constraintlayout:2.1.4      // 布局
-dev.ffmpegkit-maintained:llama-android:0.1.1          // 本地 AI（已停止部署，依赖保留）
+androidx.swiperefreshlayout:swiperefreshlayout:1.1.0  // 下拉刷新
 ```
 
 > 💡 核心功能（图表绘制、SQL 操作、规则引擎、通知解析）**全部自主实现**，未依赖任何 ORM、图表或 NLP 框架。
@@ -180,6 +180,7 @@ app/src/main/
 
 | 版本 | 主要更新 |
 |------|---------|
+| v1.2 | 新增「待处理消息」独立界面（未识别通知集中处理，支持去记账 / 忽略）；账单列表支持下拉刷新；启动时主动检测并引导开启通知使用权；识别关键词补充「转账给 / 转给 / 付给」等场景 |
 | v1.1 | 新增智能通知识别（监听微信/支付宝消费通知，自动解析金额入账）；首次开源发布：清理隐私信息、完善项目文档 |
 | v1.0 | 首版完成：基础记账、后台常驻保活、多账户财务总览、Canvas 图表统计、主题换肤、笔记待办、数据导出备份 |
 
@@ -195,6 +196,6 @@ app/src/main/
 
 ## 👤 作者
 
-独立开发 · 2025.09 – 2026.09
+个人项目 · 2025.09 – 2026.09
 
 如有问题或建议，欢迎提交 Issue。

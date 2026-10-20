@@ -98,11 +98,6 @@ public class BillNotificationListener extends NotificationListenerService {
 
         String content = (title == null ? "" : title) + " " + (text == null ? "" : text);
 
-        // 广告过滤：广告/营销通知直接忽略，不入账也不入待办
-        if (BillParser.isAdvertisement(content)) {
-            return;
-        }
-
         BillParser.Result r = BillParser.parse(pkg, title, text);
 
         // 只记录真正解析成功（消费/退款）的通知，过滤营销、无关等非必要信息
@@ -110,6 +105,8 @@ public class BillNotificationListener extends NotificationListenerService {
             long now = System.currentTimeMillis();
             // 去重：同一笔账单（同来源+同金额+5分钟内）只记录一次
             if (db.hasDuplicateTransaction(r.type, r.amount, r.source, now)) {
+                // 重复跳过（日志编码 -3），便于诊断"为什么这笔没记"
+                db.insertNotifyLog(r.source, title, text, false, -3, 0, now);
                 return;
             }
             String note = (title == null ? "" : title) + " " + (text == null ? "" : text);
@@ -127,9 +124,25 @@ public class BillNotificationListener extends NotificationListenerService {
             t.note = note.trim();
             db.insertTransaction(t);
         } else {
-            // 无法分辨收支金额 / 是否为收支信息，但疑似收支 → 加入待办，供用户手动处理
+            // 广告过滤后置：真实账单（金额+收支方向明确）在上面已入账，永不被误杀；
+            // 营销/推广通知通常解析不出收支方向，落到这里按广告词丢弃（日志编码 -2）
+            if (BillParser.isAdvertisement(content)) {
+                String src = BillParser.getSource(pkg);
+                db.insertNotifyLog(src == null ? pkg : src, title, text, false, -2, 0,
+                        System.currentTimeMillis());
+                return;
+            }
+            // 无法分辨收支金额 / 是否为收支信息，但疑似收支 → 加入待办，供用户手动处理（日志编码 -1）
             if (BillParser.isSuspectedBill(content)) {
+                String src = BillParser.getSource(pkg);
+                long now = System.currentTimeMillis();
+                db.insertNotifyLog(src == null ? pkg : src, title, text, false, -1, 0, now);
                 addToTodo(pkg, content.trim());
+            } else {
+                // 无关通知（非收支非广告，日志编码 -4）
+                String src = BillParser.getSource(pkg);
+                db.insertNotifyLog(src == null ? pkg : src, title, text, false, -4, 0,
+                        System.currentTimeMillis());
             }
         }
     }

@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jizhang.AddTransactionActivity;
+import com.example.jizhang.PendingMessageActivity;
 import com.example.jizhang.R;
 import com.example.jizhang.adapter.BillAdapter;
 import com.example.jizhang.db.DatabaseHelper;
 import com.example.jizhang.model.Category;
 import com.example.jizhang.model.Channel;
+import com.example.jizhang.model.Note;
 import com.example.jizhang.model.Transaction;
 import com.example.jizhang.util.Exporter;
 import com.example.jizhang.util.Palette;
@@ -44,6 +46,9 @@ public class BillFragment extends Fragment {
     private TextView tvExpense, tvIncome, tvBalance, tvEmpty;
     private View bannerBackup, emptyState;
     private TextView btnShowHidden;
+    private TextView tvPendingText;
+    private View btnPendingView;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
     private boolean showAll = false; // 是否显示全部账单（默认只显示最近 3 天）
 
     @Nullable
@@ -69,6 +74,13 @@ public class BillFragment extends Fragment {
             showAll = !showAll;
             loadData();
         });
+
+        // 下拉刷新：重新加载账单与本月汇总
+        swipeRefresh = view.findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeColors(
+                view.getContext().getColor(R.color.primary),
+                view.getContext().getColor(R.color.expense));
+        swipeRefresh.setOnRefreshListener(this::loadData);
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -105,6 +117,12 @@ public class BillFragment extends Fragment {
         // 大绿色按钮 → 快速记账
         view.findViewById(R.id.btn_add_new).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AddTransactionActivity.class)));
+
+        // 待处理消息入口：识别失败转待办的通知（有消息才显示）
+        btnPendingView = view.findViewById(R.id.btn_pending);
+        tvPendingText = view.findViewById(R.id.tv_pending_text);
+        btnPendingView.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), PendingMessageActivity.class)));
 
         // 备份提示条 → 弹导出/备份
         bannerBackup.setOnClickListener(v -> showBackupDialog());
@@ -171,7 +189,26 @@ public class BillFragment extends Fragment {
             btnShowHidden.setVisibility(View.VISIBLE);
         }
 
+        // 待处理消息入口：统计"来源·待识别"的待办数量
+        int pendingMsgs = 0;
+        for (Note n : db.queryNotesByTodo(1)) {
+            if (n.title != null && n.title.contains("待识别")) {
+                pendingMsgs++;
+            }
+        }
+        if (pendingMsgs > 0) {
+            tvPendingText.setText("🔔 待处理消息（" + pendingMsgs + " 条待确认）");
+            btnPendingView.setVisibility(View.VISIBLE);
+        } else {
+            btnPendingView.setVisibility(View.GONE);
+        }
+
         emptyState.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
+
+        // 下拉刷新动画收尾
+        if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+            swipeRefresh.setRefreshing(false);
+        }
     }
 
     private void confirmDelete(Transaction t) {

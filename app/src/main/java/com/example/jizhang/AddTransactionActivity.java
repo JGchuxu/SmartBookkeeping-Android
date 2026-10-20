@@ -35,6 +35,10 @@ import java.util.List;
 public class AddTransactionActivity extends BaseActivity {
 
     public static final String EXTRA_ID = "extra_id";
+    /** 预填金额（待处理消息"去记账"用） */
+    public static final String EXTRA_AMOUNT = "extra_amount";
+    /** 预填备注 */
+    public static final String EXTRA_NOTE = "extra_note";
 
     private DatabaseHelper db;
     private int type = Transaction.TYPE_EXPENSE;
@@ -61,6 +65,10 @@ public class AddTransactionActivity extends BaseActivity {
 
         editingId = getIntent().getLongExtra(EXTRA_ID, -1);
 
+        // 预填（待处理消息 → 去记账）
+        double preAmount = getIntent().getDoubleExtra(EXTRA_AMOUNT, -1);
+        String preNote = getIntent().getStringExtra(EXTRA_NOTE);
+
         tvExpense = findViewById(R.id.tv_type_expense);
         tvIncome = findViewById(R.id.tv_type_income);
         etAmount = findViewById(R.id.et_amount);
@@ -68,6 +76,14 @@ public class AddTransactionActivity extends BaseActivity {
         spinnerChannel = findViewById(R.id.spinner_channel);
         gridCategory = findViewById(R.id.grid_category);
         tvDateTime = findViewById(R.id.tv_date_time);
+
+        // 预填金额与备注（来自"待处理消息"）
+        if (preAmount > 0) {
+            etAmount.setText(String.valueOf(preAmount));
+        }
+        if (preNote != null && !preNote.isEmpty()) {
+            etNote.setText(preNote);
+        }
 
         categoryAdapter = new CategoryGridAdapter();
         categoryAdapter.setListener(new CategoryGridAdapter.OnCategoryClick() {

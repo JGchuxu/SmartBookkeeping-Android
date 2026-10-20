@@ -44,14 +44,34 @@ public class NotifyLogAdapter extends RecyclerView.Adapter<NotifyLogAdapter.VH> 
         int sourceColor = "支付宝".equals(l.source) ? 0xFF1677FF : 0xFF07C160;
         h.source.getBackground().setTint(sourceColor);
 
-        // 状态：未识别 / 收入¥xx / 支出¥xx
+        // 状态：入账 / 解析失败 / 广告过滤 / 重复跳过 / 无关通知
         if (l.parsed) {
             boolean income = l.resultType == Transaction.TYPE_INCOME;
             h.status.setText((income ? "收入" : "支出") + " ¥" + Palette.formatAmount(l.resultAmount));
             h.status.setTextColor(income ? Palette.COLOR_INCOME : Palette.COLOR_EXPENSE);
         } else {
-            h.status.setText("未识别");
-            h.status.setTextColor(0xFF999999);
+            // 负数编码 = 处理原因（诊断用）
+            String reason;
+            int color = 0xFF999999;
+            switch (l.resultType) {
+                case -1:
+                    reason = "❓ 解析失败（已转待处理）";
+                    color = 0xFFFF8C00; // 橙：需要用户关注
+                    break;
+                case -2:
+                    reason = "🚫 广告/营销（已过滤）";
+                    break;
+                case -3:
+                    reason = "🔁 重复通知（已跳过）";
+                    break;
+                case -4:
+                    reason = "📴 无关通知";
+                    break;
+                default:
+                    reason = "未识别";
+            }
+            h.status.setText(reason);
+            h.status.setTextColor(color);
         }
 
         h.title.setText(l.title == null || l.title.isEmpty() ? "（无标题）" : l.title);

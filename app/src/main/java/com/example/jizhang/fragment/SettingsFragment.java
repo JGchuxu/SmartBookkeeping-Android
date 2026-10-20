@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.example.jizhang.AIChatActivity;
 import com.example.jizhang.CategoryManageActivity;
 import com.example.jizhang.ChannelManageActivity;
 import com.example.jizhang.NotifyLogActivity;
@@ -60,8 +59,6 @@ public class SettingsFragment extends Fragment {
         view.findViewById(R.id.item_notify).setOnClickListener(v -> handleNotify());
         view.findViewById(R.id.item_notify_log).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), NotifyLogActivity.class)));
-        view.findViewById(R.id.item_ai).setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), AIChatActivity.class)));
 
         // 主题换肤
         tvThemeName = view.findViewById(R.id.tv_theme_name);
